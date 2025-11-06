@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Large Voter Registration System</title>
+  <style>
+    :root {
+      --main:#1e3a8a; --mainsub: #2563eb; --cardbg:#f3f6fc; --admin:#bbf7d0; --error:#fee2e2;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background:var(--cardbg);}
+    nav {
+      background: var(--main);
+      color: #fff;
+      padding: 1.2em 2em; font-size: 1.3em;
+      display: flex; justify-content: space-between; align-items:center;
+      box-shadow: 0 2px 8px #0013;
+    }
+    nav .logo { font-weight: bold; letter-spacing:1px; font-size:1.3em;}
+    nav button {
+      margin-left: 0.8em;
+      background: var(--mainsub); color: #fff;
+      border-radius:3px; border:none; 
+      font: inherit; padding: 0.5em 1.2em; cursor: pointer;
+      transition:.2s;
+    }
+    nav button:hover { background: #0a2654; }
+    main { 
+      max-width: 950px; margin:2em auto; 
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 14px #bbb4;
+      padding: 2.8em 2.2em; min-height: 600px; 
+    }
+    main > section { display: none; }
+    main > section.active { display: block; }
+    h1, h2 { text-align:center; margin:0.4em 0; }
+    h1 { color:var(--main); font-size:2.6em; }
+    .home-lead { color:#425; text-align:center; margin-bottom:1em; font-size:1.22em; }
+    .card { background: var(--cardbg); border-radius:8px; box-shadow:0 1px 5px #e5e5f7; margin:2em auto;padding:2em; max-width:520px;}
+    form { display:flex; flex-direction: column; gap:1.3em; }
+    input, select {
+      padding:0.8em; border:1px solid #b5bad1; border-radius: 5px;
+      font-size:1em; transition:.2s;
+    }
+    button[type="submit"], .main-btn {
+      padding:0.7em 1.4em; background:var(--main); color:white; border:none; border-radius:4px; font-size:1em; font-weight:500; margin:auto;
+      margin-top:1em; cursor:pointer; transition:0.21s;
+    }
+    button[type="submit"]:hover, .main-btn:hover { background: #233061;}
+    .form-msg { color: #ba2121; text-align:center; margin-top:-0.7em; margin-bottom: 1em; }
+    table {
+      border-collapse: collapse; width: 100%; margin-top: 1.1em;
+    }
+    th, td { border: 1px solid #bbb; padding: 0.6em; text-align: center; }
+    thead { background: #dbeafe; }
+    .admin-btns button {margin:0 2px; font-size:.98em;}
+    .status-approved { color: #15803d; font-weight:600;}
+    .status-rejected { color: #be123c; font-weight:600;}
+    .status-pending  { color: #92400e; font-weight:600;}
+    .flex { display: flex; gap:1.2em; }
+    .sysdesign-card { padding:2em 1em 1.2em 1em; background:#eff6ff; border-radius:9px; margin:2em 0;}
+    .diagram-block { text-align:center; }
+    pre.diagram { background: #c7d3ee; font-size:1.1em; line-height:1.9em; border-radius:9px; display:inline-block; padding: 18px 8px;
+      margin-top:1.5em; box-shadow: 0 2px 6px #bbb4; border:2px solid #a3bcf7; }
+    @media (max-width: 800px) {
+      main { padding:1em; }
+      .card { padding:1em;}
+      table { font-size:0.92em;}
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <span class="logo">WeVote: Voter Registration System</span>
+  <div>
+    <button onclick="showPage('homePage')">Home</button>
+    <button onclick="showPage('designPage')">System Design</button>
+    <button onclick="showPage('loginPage')">Login</button>
+    <button onclick="showPage('signupPage')">Sign Up</button>
+    <button onclick="showPage('dashboardPage')">Dashboard</button>
+  </div>
+</nav>
+<main>
+  <!-- Home -->
+  <section id="homePage" class="active">
+    <h1>Be the Change, Vote NOW!</h1>
+    <div class="home-lead">
+      Welcome to the Web-Based Voter Registration System.<br>
+      Register as a voter, login, or (if admin) review records and manage approvals.<br><br>
+      The future of democracy starts with your registration!
+    </div>
+    <div class="card" style="background: linear-gradient(90deg, #c7d2fe, #e0e7ff); text-align:center;">
+      <b>Quick Links:</b><br>
+      <button class="main-btn" onclick="showPage('signupPage')">New voter? Register Now</button>
+      <button class="main-btn" onclick="showPage('loginPage')">Already registered? Login</button>
+      <button class="main-btn" onclick="showPage('dashboardPage')">Go to Dashboard</button>
+    </div>
+  </section>
+  
+  <!-- Sign Up -->
+  <section id="signupPage">
+    <h2>Create Your Voter Account</h2>
+    <div class="card">
+      <form id="signupForm">
+        <input type="text" id="signupFullName" placeholder="Full Name" required>
+        <input type="text" id="signupAadhar" placeholder="Aadhar Number" required>
+        <input type="text" id="signupVoterId" placeholder="Voter ID" required>
+        <input type="text" id="signupPhone" placeholder="Phone Number" required>
+        <input type="password" id="signupPassword" placeholder="Password" required>
+        <button type="submit">Register</button>
+      </form>
+      <span class="form-msg" id="signupMsg"></span>
+    </div>
+  </section>
+
+  <!-- Login -->
+  <section id="loginPage">
+    <h2>Voter Login</h2>
+    <div class="card">
+      <form id="loginForm">
+        <input type="text" id="loginAadhar" placeholder="Aadhar Number" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+      <span class="form-msg" id="loginMsg"></span>
+    </div>
+  </section>
+
+  <!-- Dashboard/Admin -->
+  <section id="dashboardPage">
+    <h2>Admin Dashboard / Voter Records</h2>
+    <div class="card">
+      <div class="flex" style="flex-wrap:wrap;">
+        <input type="text" id="searchInput" placeholder="Search by Name/Aadhar/ID..." style="flex:2;">
+        <button class="main-btn" onclick="exportCSV()" style="flex:1;">Export CSV</button>
+        <input type="file" id="importCSV" style="display:none" onchange="importCSV(event)">
+        <button class="main-btn" style="flex:1;" onclick="document.getElementById('importCSV').click()">Import CSV</button>
+      </div>
+      <table id="votersTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Aadhar</th>
+            <th>Voter ID</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- System Design -->
+  <section id="designPage">
+    <h2>System Design Overview</h2>
+    <div class="sysdesign-card">
+      <b>Objective:</b>
+      <div style="margin:0.7em 0 1.5em 0;font-size:1.08em;">
+        Build a <b>secure</b>, <b>efficient</b>, and <b>user-friendly</b> Web Voter Registration System for easy signup, update and admin approval of voters.
+      </div>
+
+      <b>Architecture Diagram:</b>
+      <div class="diagram-block">
+        <pre class="diagram">
++--------------------------+
+|   Voter (User Browser)   |
++-------------+------------+
+              |
+              v
++--------------------------+
+|   Frontend (HTML/CSS/JS) |
++-------------+------------+
+              |
+              v
++--------------------------+
+|  Local Storage/Database  |
++--------------------------+
+              ^
+              |
++-------------+------------+
+|       Admin Dashboard    |
++--------------------------+
+        </pre>
+      </div>
+
+      <b>Main System Features</b>
+      <ul>
+        <li>Registration, Login, Record Management—all in one place</li>
+        <li>Admin can approve/reject/delete voters—status stored locally</li>
+        <li>CSV export/import and live search</li>
+        <li>Modern, responsive UI for different devices</li>
+      </ul>
+    </div>
+  </section>
+</main>
+<script>
+const pages = ['homePage', 'signupPage', 'loginPage', 'dashboardPage', 'designPage'];
+function showPage(id) {
+  pages.forEach(p => document.getElementById(p).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Registration (Sign Up) Logic
+document.getElementById('signupForm').onsubmit = function(e) {
+  e.preventDefault();
+  const name = document.getElementById('signupFullName').value.trim();
+  const aadhar = document.getElementById('signupAadhar').value.trim();
+  const voterId = document.getElementById('signupVoterId').value.trim();
+  const phone = document.getElementById('signupPhone').value.trim();
+  const password = document.getElementById('signupPassword').value.trim();
+  let voters = JSON.parse(localStorage.getItem('voters') || '[]');
+  if (voters.find(v => v.aadhar === aadhar)) {
+    document.getElementById('signupMsg').textContent = "Aadhar already registered!";
+    return;
+  }
+  voters.push({name, aadhar, voterId, phone, password, status: 'Pending'});
+  localStorage.setItem('voters', JSON.stringify(voters));
+  document.getElementById('signupMsg').textContent = "Registration submitted. Await admin approval.";
+  this.reset();
+  renderTable();
+};
+
+// Login Logic (simple demo)
+document.getElementById('loginForm').onsubmit = function(e) {
+  e.preventDefault();
+  const aadhar = document.getElementById('loginAadhar').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+  let voters = JSON.parse(localStorage.getItem('voters') || '[]');
+  let voter = voters.find(v => v.aadhar === aadhar && v.password === password);
+  if (!voter) {
+    document.getElementById('loginMsg').textContent = "Login failed!";
+    return;
+  }
+  document.getElementById('loginMsg').textContent = "Login successful. Status: "+voter.status;
+  setTimeout(()=>showPage('dashboardPage'), 750);
+  renderTable();
+};
+
+// Search & filter
+document.getElementById('searchInput').oninput = function() {
+  renderTable(this.value);
+};
+
+// Render records table
+function renderTable(filter='') {
+  let voters = JSON.parse(localStorage.getItem('voters') || '[]');
+  const tbody = document.getElementById('votersTable').querySelector('tbody');
+  tbody.innerHTML = '';
+  voters.filter(v =>
+    v.name.toLowerCase().includes(filter.toLowerCase()) ||
+    v.aadhar.includes(filter) ||
+    v.voterId.includes(filter)
+  ).forEach((v, idx) => {
+    let tr = document.createElement('tr');
+    let statusClass = v.status === 'Approved' ? 'status-approved' : 
+                      v.status === 'Rejected' ? 'status-rejected' : 'status-pending';
+    tr.innerHTML = `
+      <td>${v.name}</td>
+      <td>${v.aadhar}</td>
+      <td>${v.voterId}</td>
+      <td>${v.phone}</td>
+      <td class="${statusClass}">${v.status}</td>
+      <td class="admin-btns">
+        <button onclick="approveVoter(${idx})" title="Approve">Approve</button>
+        <button onclick="rejectVoter(${idx})" title="Reject">Reject</button>
+        <button onclick="deleteVoter(${idx})" title="Delete">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+window.renderTable = renderTable;
+
+function approveVoter(idx) {
+  let voters = JSON.parse(localStorage.getItem('voters') || '[]');
+  voters[idx].status = 'Approved';
+  localStorage.setItem('voters', JSON.stringify(voters));
+  renderTable();
+}
+function rejectVoter(idx) {
+  let voters = JSON.parse(localStorage.getItem('voters') || '[]');
+  voters[idx].status = 'Rejected';
+  localStorage.setItem('voters', JSON.stringify(voters));
+  renderTable();
+}
+function deleteVoter(idx) {
+  let voters = JSON.parse(localStorage.getItem('voters') || '[]');
+  voters.splice(idx,1);
+  localStorage.setItem('voters', JSON.stringify(voters));
+  renderTable();
+}
+
+// CSV Export/Import
+function exportCSV() {
+  let voters = JSON.parse(localStorage.getItem('voters') || '[]');
+  let csv = "Name,Aadhar,VoterID,Phone,Status\n" +
+      voters.map(v => `${v.name},${v.aadhar},${v.voterId},${v.phone},${v.status}`).join('\n');
+  let blob = new Blob([csv], {type: 'text/csv'});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = url; a.download = 'voters.csv';
+  a.click();
+}
+function importCSV(e) {
+  let file = e.target.files[0];
+  if (!file) return;
+  let reader = new FileReader();
+  reader.onload = function(evt) {
+    let lines = evt.target.result.split('\n').slice(1);
+    let voters = lines.filter(Boolean).map(l => {
+      let [name, aadhar, voterId, phone, status] = l.split(',');
+      return {name, aadhar, voterId, phone, status: status || 'Pending'};
+    });
+    localStorage.setItem('voters', JSON.stringify(voters));
+    renderTable();
+  };
+  reader.readAsText(file);
+}
+window.approveVoter = approveVoter;
+window.rejectVoter = rejectVoter;
+window.deleteVoter = deleteVoter;
+window.exportCSV = exportCSV;
+window.importCSV = importCSV;
+// Init
+renderTable();
+</script>
+</body>
+</html>
